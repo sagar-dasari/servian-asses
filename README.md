@@ -1,5 +1,3 @@
-# servian-asses
-
 # Introduction
 This document is maninly for deploying Databricks and DataFatory services along with Vnet using Azure Blueprints on Azure Cloud. 
 
