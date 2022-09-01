@@ -21,3 +21,7 @@ And Download the Az.Blueprint module from the powershell gallery:
 In this document we are deploying a simple web activity for connecting salesforce cloud and loading the data to ADLS location and after apply some transformation logic and share data to downstream users. As part of this we are deploying IOC as Databricks and DataFactory with Vnet enabled.
 
 Please refer the attached bluepritns document along with data copy ARM template
+
+# How to use this guide
+
+This guide references the files in the Code/blueprints directory and deploys the blueprint as a draft definition to Azure.
