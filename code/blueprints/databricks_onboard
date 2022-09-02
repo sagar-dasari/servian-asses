@@ -1,0 +1,77 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "tags": {
+      "type": "object"
+    },
+    "workspaceName": {
+      "type": "string"
+    },
+    "pricingTier": {
+      "type": "string",
+      "defaultValue": "premium",
+      "metadata": {
+        "description": "The pricing tier of the workspace"
+      },
+      "allowedValues": [
+        "standard",
+        "premium"
+      ]
+    },
+    "managedResourceGroup": {
+      "type": "string"
+    },
+    "virtualNetworkId": {
+      "type": "string"
+    },
+    "privateSubnet": {
+      "type": "string"
+    },
+    "publicSubnet": {
+      "type": "string"
+    },
+    "disablePublicIP": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Specifies whether to deploy Azure Databricks workspace with Secure Cluster Connectivity (No Public IP) enabled or not"
+      }
+    }
+  },
+  "variables": {
+    "managedResourceGroupId": "[concat(subscription().id, '/resourceGroups/', parameters('managedResourceGroup'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Databricks/workspaces",
+      "apiVersion": "2021-04-01-preview",
+      "name": "[parameters('workspaceName')]",
+      "location": "[resourceGroup().location]",
+      "tags": "[parameters('tags')]",
+      "sku": {
+        "name": "[parameters('pricingTier')]"
+      },
+      "properties": {
+        "managedResourceGroupId": "[variables('managedResourceGroupId')]",
+        "parameters": {
+          "prepareEncryption": {
+            "value": true
+          },
+          "customVirtualNetworkId": {
+            "value": "[parameters('virtualNetworkId')]"
+          },
+          "customPublicSubnetName": {
+            "value": "[parameters('publicSubnet')]"
+          },
+          "customPrivateSubnetName": {
+            "value": "[parameters('privateSubnet')]"
+          },
+          "enableNoPublicIp": {
+            "value": "[parameters('disablePublicIP')]"
+          }
+        }
+      }
+    }
+  ]
+}
