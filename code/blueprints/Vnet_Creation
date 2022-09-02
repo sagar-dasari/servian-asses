@@ -1,0 +1,117 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "tags": {
+      "type": "object"
+    },
+    "virtualNetwork": {
+      "type": "string"
+    },
+    "addressSpaces": {
+      "type": "array"
+    },
+    "subnets": {
+      "type": "array"
+    },
+    "routes": {
+      "type": "array"
+    },
+    "securityRules": {
+      "type": "array"
+    },
+    "dnsServers": {
+      "type": "array"
+    }
+  },
+  "variables": {
+    "routeTableName": "[concat(parameters('virtualNetwork'),'-rt')]",
+    "securityGroupName": "[concat(parameters('virtualNetwork'),'-nsg')]",
+    "routeTableId": {
+      "id": "[resourceId('Microsoft.Network/routeTables',variables('routeTableName'))]"
+    },
+    "securityGroupId": {
+      "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('securityGroupName'))]"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/routeTables",
+      "name": "[variables('routeTableName')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "copy": [
+          {
+            "name": "routes",
+            "count": "[length(parameters('routes'))]",
+            "input": {
+              "name": "[parameters('routes')[copyIndex('routes')].name]",
+              "properties": {
+                "addressPrefix": "[parameters('routes')[copyIndex('routes')].addressPrefix]",
+                "nextHopType": "[parameters('routes')[copyIndex('routes')].nextHopType]",
+                "nextHopIpAddress": "[parameters('routes')[copyIndex('routes')].nextHopIpAddress]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2017-06-01",
+      "name": "[variables('securityGroupName')]",
+      "location": "[resourceGroup().location]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "securityRules": "[parameters('securityRules')]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2019-09-01",
+      "name": "[parameters('virtualNetwork')]",
+      "location": "[resourceGroup().location]",
+      "tags": "[parameters('tags')]",
+      "dependsOn": [
+        "[variables('routeTableName')]",
+        "[variables('securityGroupName')]"
+      ],
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": "[parameters('addressSpaces')]"
+        },
+        "dhcpOptions": {
+          "dnsServers": "[parameters('dnsServers')]"
+        },
+        "copy": [
+          {
+            "name": "subnets",
+            "count": "[length(parameters('subnets'))]",
+            "input": {
+              "name": "[parameters('subnets')[copyIndex('subnets')].name]",
+              "properties": {
+                "addressPrefix": "[parameters('subnets')[copyIndex('subnets')].addressSpace]",
+                "serviceEndpoints": "[parameters('subnets')[copyIndex('subnets')].serviceEndpoints]",
+                "routeTable": "[if(parameters('subnets')[copyIndex('subnets')].routeTable,variables('routeTableId'),json('null'))]",
+                "networkSecurityGroup": "[if(parameters('subnets')[copyIndex('subnets')].securityGroup,variables('securityGroupId'),json('null'))]",
+                "delegations": "[parameters('subnets')[copyIndex('subnets')].delegations]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "subnets": {
+      "type": "array",
+      "value": "[reference(parameters('virtualNetwork')).subnets]"
+    },
+    "virtualNetworkId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetwork'))]"
+    }
+  }
+}
