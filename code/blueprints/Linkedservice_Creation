@@ -1,0 +1,17 @@
+{
+    "name": "AzureDatabricks1",
+    "properties": {
+        "annotations": [],
+        "type": "AzureDatabricks",
+        "typeProperties": {
+            "domain": "https://adb-374888300.10.azuredatabricks.net",
+            "authentication": "MSI",
+            "workspaceResourceId": "/subscriptions/de6c4a03-26cc-4b28-8666-f57b17ef373b/resourceGroups/tcp-DATABRICKS/providers/Microsoft.Databricks/workspaces/tcp-DATABRICKS",
+            "newClusterNodeType": "Standard_DS3_v2",
+            "newClusterNumOfWorker": "1",
+            "newClusterVersion": "10.4.x-scala2.12",
+            "newClusterInitScripts": [],
+            "clusterOption": "Fixed"
+        }
+    }
+}
