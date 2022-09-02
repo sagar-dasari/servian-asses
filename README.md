@@ -20,7 +20,8 @@ And Download the Az.Blueprint module from the powershell gallery:
 # Architecture
 In this document we are deploying a simple web activity for connecting salesforce cloud and loading the data to ADLS location and after apply some transformation logic and share data to downstream users. As part of this we are deploying IOC as Databricks and DataFactory with Vnet enabled.
 
-Please refer the attached bluepritns document along with data copy ARM template
+In this document on coding session I have placed blueprints and ARM template to run a python script on databricks cluster from Data factory orchestration tool
+
 
 # How to use this guide
 
